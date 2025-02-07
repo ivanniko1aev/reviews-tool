@@ -26,7 +26,7 @@
         <div class="hero-content">
             <h1>Get Google Reviews in Seconds</h1>
             <p>Embed Google reviews onto your site with just a few clicks.</p>
-            <input type="text" id="google-url" class="input-field" placeholder="Enter Google Maps URL">
+            <input type="text" id="google-url" class="input-field-main" placeholder="Enter Google Maps URL">
             <button id="scrape-btn" class="cta-btn">Generate Code</button>
             <!-- Loading spinner -->
 <div id="loading" style="display:none;">⏳ Scraping reviews... This might take a minute.</div>
@@ -34,14 +34,20 @@
         </div>
     </section>
 
- <!-- Reviews Section -->
-<section id="reviews-section">
-    <div id="reviews-container">
-        <div class="review-carousel">
-            <!-- Reviews will be dynamically added here -->
+       <!-- Reviews Section with Carousel -->
+       <div id="reviews-section">
+        <h2>Customer Reviews</h2>
+        <div id="reviews-container">
+            <div class="review-carousel" id="review-carousel">
+                <!-- Reviews will be dynamically inserted here -->
+            </div>
+        </div>
+        <!-- Optional: Add navigation buttons -->
+        <div class="carousel-controls">
+            <button id="prev-btn" onclick="scrollCarousel('prev')">Prev</button>
+            <button id="next-btn" onclick="scrollCarousel('next')">Next</button>
         </div>
     </div>
-</section>
 
     <!-- Customization Section -->
 <section class="customization" id="features">
@@ -100,7 +106,21 @@
         
         
 
-        <div id="preview" class="preview-container"></div>
+        <!-- Reviews Section with Carousel -->
+<div id="reviews-section">
+    <h2>Customer Reviews</h2>
+    <div id="reviews-container">
+        <div class="review-carousel" id="review-carousel">
+            <!-- Reviews will be dynamically inserted here -->
+        </div>
+    </div>
+    <!-- Optional: Add navigation buttons -->
+    <div class="carousel-controls">
+        <button id="prev-btn" onclick="scrollCarousel('prev')">Prev</button>
+        <button id="next-btn" onclick="scrollCarousel('next')">Next</button>
+    </div>
+</div>
+
 
         <h3>Embed Code</h3>
         <textarea id="embed-code" readonly></textarea>

@@ -1,37 +1,3 @@
-// Sample review to show when the page first loads
-const sampleReview = {
-    author: "John Doe",
-    rating: 5,
-    content: "This is a sample review. Great service, highly recommended!"
-};
-
-// Initial display of the sample review in the preview container
-function displaySampleReview() {
-    const preview = document.getElementById("preview");
-    preview.style.backgroundColor = '#ffffff'; // Default background color
-    preview.style.color = '#000000'; // Default text color
-    preview.innerHTML = `
-        <div class="review">
-            <h3>${sampleReview.author} (${sampleReview.rating})</h3>
-            <p>${sampleReview.content}</p>
-        </div>
-    `;
-}
-
-// Update preview with selected colors and review data
-function updatePreview(bgColor, textColor, review) {
-    const preview = document.getElementById("preview");
-    preview.style.backgroundColor = bgColor;
-    preview.style.color = textColor;
-
-    preview.innerHTML = `
-        <div class="review">
-            <h3>${review.author} (${review.rating})</h3>
-            <p>${review.content}</p>
-        </div>
-    `;
-}
-
 // Call displaySampleReview on page load to show the default review
 document.addEventListener('DOMContentLoaded', () => {
     displaySampleReview();
@@ -57,6 +23,7 @@ document.getElementById("scrape-btn").addEventListener("click", async () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "api-key": "YOUR_API_KEY",
             },
             body: JSON.stringify({
                 google_maps_url: googleUrl,
@@ -119,6 +86,94 @@ document.getElementById("customization-form").addEventListener("submit", functio
 
     updatePreview(bgColor, textColor, sampleReview); // Use sample review for initial state
 
-    const embedCode = `<iframe src="https://yourwebsite.com/reviews/embedded?font=${font}&font-size=${fontSize}&bg-color=${bgColor}&text-color=${textColor}" width="500" height="400"></iframe>`;
-    document.getElementById("embed-code").value = embedCode;
+    const embedCode = `<iframe src="https://yourapi.com/embed?api_key=${apiKey}" width="500" height="400"></iframe>`;
+document.getElementById("embed-code").value = embedCode;
+
+});
+
+// Sample reviews to show in carousel (can be dynamically loaded)
+const reviews = [
+    { author: "John Doe", rating: 5, content: "This is a sample review. Great service, highly recommended!" },
+    { author: "Jane Smith", rating: 4, content: "Very good service, would definitely use again." },
+    { author: "Alex Johnson", rating: 5, content: "Outstanding! They exceeded my expectations." },
+    { author: "Emily Davis", rating: 4, content: "Good service, but there was a slight delay." },
+    { author: "Michael Brown", rating: 5, content: "Fantastic job! Highly recommend them." }
+];
+
+async function displayReviews() {
+    const apiKey = localStorage.getItem("api_key");
+    const response = await fetch("/get-snippets/", {
+        method: "GET",
+        headers: { "api_key": apiKey }
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        const reviews = data.snippets;  // Get reviews from API
+        const carousel = document.getElementById("review-carousel");
+        carousel.innerHTML = ''; // Clear existing reviews
+
+        reviews.forEach(review => {
+            const reviewElement = document.createElement("div");
+            reviewElement.classList.add("review");
+            reviewElement.innerHTML = `
+                <p>${review.embed_code}</p>
+            `;
+            carousel.appendChild(reviewElement);
+        });
+    } else {
+        console.error("Failed to fetch reviews.");
+    }
+}
+
+
+// Function to scroll carousel
+function scrollCarousel(direction) {
+    const carousel = document.getElementById("review-carousel");
+    const scrollAmount = 320;  // Adjust this value for how far you want to scroll
+
+    if (direction === 'next') {
+        carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    } else {
+        carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    }
+}
+
+// Wait for the DOM to be fully loaded before calling displayReviews
+document.addEventListener('DOMContentLoaded', function() {
+    displayReviews();
+});
+
+async function signupUser(email) {
+    try {
+        const response = await fetch("/signup/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem("api_key", data.api_key);
+            alert("Signup successful! Your API key is stored.");
+        } else {
+            alert("Signup failed. Try again.");
+        }
+    } catch (error) {
+        console.error("Error during signup:", error);
+        alert("Signup error. Please try again.");
+    }
+}
+
+const apiKey = localStorage.getItem("api_key");  // Get stored API key
+
+const response = await fetch("/scrape-reviews", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "api_key": apiKey || "" // Use stored API key
+    },
+    body: JSON.stringify({
+        google_maps_url: googleUrl
+    }),
 });

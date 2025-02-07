@@ -138,7 +138,7 @@ footer a {
 }
 
 /* Input Class */
-.input-field {
+.input-field-main {
     width: 30%;
     padding: 12px 15px;
     font-size: 16px;
@@ -150,7 +150,7 @@ footer a {
     transition: border-color 0.3s;
 }
 
-.input-field:focus {
+.input-field-main:focus {
     border-color: #ff7a18;
     outline: none;
 }
@@ -203,27 +203,61 @@ footer a {
     margin-bottom: 15px;
 }
 
-/* Author and review content styling */
-.review h3 {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 10px;
+/* Style for Reviews Carousel */
+#reviews-section {
+    padding: 50px 20px;
+    background-color: #f4f4f9;
+    text-align: center;
 }
 
-.review p {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.6;
+#reviews-container {
+    margin-top: 30px;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Optional: Add navigation for carousel */
-.review-carousel::-webkit-scrollbar {
-    display: none;
-}
-
+/* Carousel container */
 .review-carousel {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 20px;
+    padding: 20px;
+    scroll-behavior: smooth;
+}
+
+/* Individual review card */
+.review {
+    flex: 0 0 300px;  /* Adjust to show up to 3 reviews at a time */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    scroll-snap-align: start;
+    transition: transform 0.3s ease;
+}
+
+.review:hover {
+    transform: scale(1.05);
+}
+
+/* Carousel Navigation */
+.carousel-controls {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 /* Customization Section Styles */
@@ -355,3 +389,4 @@ textarea {
     border-color: #ff7a18;
     outline: none;
 }
+
