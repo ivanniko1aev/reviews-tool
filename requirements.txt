@@ -1,0 +1,5 @@
+fastapi==0.95.2
+uvicorn==0.22.0
+selenium==4.9.0
+beautifulsoup4==4.12.2
+webdriver-manager==3.8.5

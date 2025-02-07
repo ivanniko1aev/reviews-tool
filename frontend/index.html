@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Scraper Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="frontend/style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav>
+            <a href="#" class="logo">GoogleEmbed</a>
+            <ul>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Get Google Reviews in Seconds</h1>
+            <p>Embed Google reviews onto your site with just a few clicks.</p>
+            <input type="text" id="google-url" class="input-field" placeholder="Enter Google Maps URL">
+            <button id="scrape-btn" class="cta-btn">Generate Code</button>
+            <!-- Loading spinner -->
+<div id="loading" style="display:none;">⏳ Scraping reviews... This might take a minute.</div>
+
+        </div>
+    </section>
+
+ <!-- Reviews Section -->
+<section id="reviews-section">
+    <div id="reviews-container">
+        <div class="review-carousel">
+            <!-- Reviews will be dynamically added here -->
+        </div>
+    </div>
+</section>
+
+    <!-- Customization Section -->
+<section class="customization" id="features">
+    <div class="container">
+        <h2>Customize Your Review Widget</h2>
+        
+        <form id="customization-form">
+            <div class="form-group">
+                <label for="font">Font</label>
+                <select id="font" class="select-field" required>
+                    <option value="Arial">Arial</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Courier New">Courier New</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="font-size">Font Size</label>
+                <input type="number" id="font-size" class="input-field" value="16" min="10" max="40" required>
+            </div>
+        
+            <!-- Custom Color Picker for Background Color -->
+            <div class="form-group">
+                <label for="bg-color">Background Color</label>
+                <div class="color-picker">
+                    <div class="color-palette">
+                        <div class="color-box-bg" style="background-color: #ff7a18;" data-color="#ff7a18"></div>
+                        <div class="color-box-bg" style="background-color: #4caf50;" data-color="#4caf50"></div>
+                        <div class="color-box-bg" style="background-color: #2196f3;" data-color="#2196f3"></div>
+                        <div class="color-box-bg" style="background-color: #ffeb3b;" data-color="#ffeb3b"></div>
+                        <div class="color-box-bg" style="background-color: #9c27b0;" data-color="#9c27b0"></div>
+                        <div class="color-box-bg" style="background-color: #f44336;" data-color="#f44336"></div>
+                    </div>
+                    <input type="text" id="bg-color" class="input-field" value="#ffffff" readonly>
+                </div>
+            </div>
+        
+            <!-- Custom Color Picker for Text Color -->
+            <div class="form-group">
+                <label for="text-color">Text Color</label>
+                <div class="color-picker">
+                    <div class="color-palette">
+                        <div class="color-box-text" style="background-color: #ff7a18;" data-color="#ff7a18"></div>
+                        <div class="color-box-text" style="background-color: #4caf50;" data-color="#4caf50"></div>
+                        <div class="color-box-text" style="background-color: #2196f3;" data-color="#2196f3"></div>
+                        <div class="color-box-text" style="background-color: #ffeb3b;" data-color="#ffeb3b"></div>
+                        <div class="color-box-text" style="background-color: #9c27b0;" data-color="#9c27b0"></div>
+                        <div class="color-box-text" style="background-color: #f44336;" data-color="#f44336"></div>
+                    </div>
+                    <input type="text" id="text-color" class="input-field" value="#000000" readonly>
+                </div>
+            </div>
+        
+            <button type="submit" class="cta-btn">Generate Embed Code</button>
+        </form>
+        
+        
+
+        <div id="preview" class="preview-container"></div>
+
+        <h3>Embed Code</h3>
+        <textarea id="embed-code" readonly></textarea>
+    </div>
+</section>
+
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <p>&copy; 2025 ReviewScraper. All rights reserved.</p>
+            <p>Follow us on <a href="#">Instagram</a>, <a href="#">Facebook</a>, <a href="#">Twitter</a></p>
+        </div>
+    </footer>
+
+    <script src="frontend/script.js"></script>
+</body>
+</html>
