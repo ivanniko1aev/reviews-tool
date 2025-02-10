@@ -1,25 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Review Scraper Tool</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="frontend/style.css">
-</head>
-<body>
+{% extends "base.html" %}
 
-    <!-- Navigation Bar -->
-    <header>
-        <nav>
-            <a href="#" class="logo">GoogleEmbed</a>
-            <ul>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+{% block title %}Home - Review Scraper Tool{% endblock %}
+
+{% block content %}
+<div id="signup-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Sign Up / Get API Key</h2>
+        <input type="email" id="signup-email" placeholder="Enter your email">
+        <button id="signup-submit">Get API Key</button>
+        <p id="signup-message"></p>
+        <button onclick="document.getElementById('signup-modal').style.display='none'">Close</button>
+    </div>
+</div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -128,14 +120,4 @@
 </section>
 
 
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="container">
-            <p>&copy; 2025 ReviewScraper. All rights reserved.</p>
-            <p>Follow us on <a href="#">Instagram</a>, <a href="#">Facebook</a>, <a href="#">Twitter</a></p>
-        </div>
-    </footer>
-
-    <script src="frontend/script.js"></script>
-</body>
-</html>
+{% endblock %}

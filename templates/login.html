@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Review Scraper Tool{% endblock %}
+
+{% block content %}
+    <section class="login">
+        <div class="container">
+            <h2>Login</h2>
+            <p>Sign in with Google to access your dashboard.</p>
+            <a href="{{ url_for('login_with_google') }}" class="cta-btn">Login with Google</a>
+        </div>
+    </section>
+{% endblock %}

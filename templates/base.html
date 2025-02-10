@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Review Scraper Tool{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav>
+            <a href="/" class="logo">GoogleEmbed</a>
+            <ul>
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#contact">Contact</a></li>
+                <li id="auth-section">
+                    {% if request.session.get("user_email") %}
+                        <button id="logout-btn">Logout</button>
+                    {% else %}
+                        <a href="{{ url_for('login') }}"><button id="login-btn">Sign Up / Login</button></a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <p>&copy; 2025 ReviewScraper. All rights reserved.</p>
+            <p>Follow us on <a href="#">Instagram</a>, <
