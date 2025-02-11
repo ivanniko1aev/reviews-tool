@@ -1,5 +1,6 @@
 import asyncio
 import secrets
+import logging
 import os
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -12,6 +13,9 @@ from backend.app.scraper import get_google_reviews
 from backend.app.auth import router as auth_router
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "default_secret_key"))
@@ -69,6 +73,10 @@ def dashboard(request: Request):
     user_email = request.session.get("user_email")
     user_name = request.session.get("user_name")
     user_picture = request.session.get("user_picture")
+
+    logger.debug(f"User email: {user_email}")
+    logger.debug(f"User name: {user_name}")
+    logger.debug(f"User picture: {user_picture}")
 
     if not user_email:
         return RedirectResponse(url="/login")
