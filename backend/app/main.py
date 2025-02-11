@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from backend.app.database import get_db, engine, Base
+from backend.app.database import get_db
 from backend.app.models import User, EmbedSnippet
 from backend.app.scraper import get_google_reviews
 from backend.app.auth import router as auth_router
@@ -26,9 +26,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ✅ Configure Jinja templates (now in `templates/`)
 templates = Jinja2Templates(directory="templates")
-
-# Create tables if they don't exist
-Base.metadata.create_all(bind=engine)
 
 # Input structure for scraping requests
 class ScrapeRequest(BaseModel):
@@ -50,12 +47,16 @@ async def scrape_reviews(request: ScrapeRequest, db: Session = Depends(get_db)):
         embed_code = f'<div class="reviews-widget">{reviews}</div>'
         
         user = db.query(User).filter(User.email == user_email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
         new_snippet = EmbedSnippet(user_id=user.id, business_url=request.google_maps_url, embed_code=embed_code)
         db.add(new_snippet)
         db.commit()
         
         return {"reviews": reviews, "embed_code": embed_code}
     except Exception as e:
+        logger.error(f"Error while scraping reviews: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/get-snippets/")
@@ -65,6 +66,9 @@ def get_snippets(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="User not authenticated")
 
     user = db.query(User).filter(User.email == user_email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
     snippets = db.query(EmbedSnippet).filter(EmbedSnippet.user_id == user.id).all()
     return {"snippets": [{"business_url": s.business_url, "embed_code": s.embed_code} for s in snippets]}
 
@@ -73,10 +77,6 @@ def dashboard(request: Request):
     user_email = request.session.get("user_email")
     user_name = request.session.get("user_name")
     user_picture = request.session.get("user_picture")
-
-    logger.debug(f"User email: {user_email}")
-    logger.debug(f"User name: {user_name}")
-    logger.debug(f"User picture: {user_picture}")
 
     if not user_email:
         return RedirectResponse(url="/login")
