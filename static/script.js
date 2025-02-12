@@ -22,7 +22,7 @@ document.getElementById("scrape-btn").addEventListener("click", async () => {
 
     const loadingElement = document.getElementById("loading");
     if (loadingElement) {
-        loadingElement.style.display = "block";
+        loadingElement.classList.remove("hidden");  // Show the loading spinner
     }
 
     try {
@@ -38,7 +38,7 @@ document.getElementById("scrape-btn").addEventListener("click", async () => {
         });
 
         if (loadingElement) {
-            loadingElement.style.display = "none";
+            loadingElement.classList.add("hidden");  // Hide the loading spinner
         }
 
         if (response.ok) {
@@ -53,13 +53,9 @@ document.getElementById("scrape-btn").addEventListener("click", async () => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    checkUserAuth(); // Check if user is already logged in
-});
-
 // Handle login button click - Show the signup modal
 document.getElementById("login-btn").addEventListener("click", () => {
-    document.getElementById("signup-modal").style.display = "block";
+    document.getElementById("signup-modal").classList.remove("hidden");
 });
 
 // Handle signup form submission
@@ -84,7 +80,7 @@ document.getElementById("signup-submit").addEventListener("click", async () => {
             document.getElementById("signup-message").innerText = "Signup successful! API key stored.";
             
             // Hide modal & update UI
-            document.getElementById("signup-modal").style.display = "none";
+            document.getElementById("signup-modal").classList.add("hidden");
             checkUserAuth();
         } else {
             document.getElementById("signup-message").innerText = "Signup failed. Try again.";
@@ -107,14 +103,13 @@ function checkUserAuth() {
     const apiKey = localStorage.getItem("api_key");
 
     if (apiKey) {
-        document.getElementById("login-btn").style.display = "none";
-        document.getElementById("logout-btn").style.display = "block";
+        document.getElementById("login-btn").classList.add("hidden");
+        document.getElementById("logout-btn").classList.remove("hidden");
     } else {
-        document.getElementById("login-btn").style.display = "block";
-        document.getElementById("logout-btn").style.display = "none";
+        document.getElementById("login-btn").classList.remove("hidden");
+        document.getElementById("logout-btn").classList.add("hidden");
     }
 }
-
 
 async function displayReviews() {
     const apiKey = localStorage.getItem("api_key");
@@ -131,8 +126,8 @@ async function displayReviews() {
 
         reviews.forEach(review => {
             const reviewElement = document.createElement("div");
-            reviewElement.classList.add("review");
-            reviewElement.innerHTML = `<p>${review.embed_code}</p>`;
+            reviewElement.classList.add("review", "bg-gray-100", "p-4", "rounded-lg", "shadow-md");
+            reviewElement.innerHTML = `<p class="text-center">${review.embed_code}</p>`;
             carousel.appendChild(reviewElement);
         });
     } else {

@@ -1,14 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-</head>
-<body>
-    <h1>Welcome, {{ user_name }}!</h1>
-    <p>Email: {{ user_email }}</p>
-    <img src="{{ user_picture }}" alt="Profile Picture" width="100">
-    <br>
-    <a href="/logout">Logout</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Feedback Forge{% endblock %}
+
+{% set body_class = 'dashboard-page' %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<section class="dashboard-header bg-primary text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <h1 class="text-4xl font-bold mb-4">Welcome, {{ user_name }}!</h1>
+        <div class="profile-info bg-white text-dark p-6 rounded-lg shadow-lg flex justify-center items-center flex-col space-y-4">
+            <img src="{{ user_picture }}" alt="Profile Picture" class="profile-picture w-24 h-24 rounded-full border-4 border-primary mb-4">
+            <p class="text-lg">Email: {{ user_email }}</p>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard Actions Section -->
+<section class="dashboard-actions py-16 bg-light">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-semibold text-primary mb-6">Your Google Reviews</h2>
+        <p class="text-lg text-dark mb-6">Manage and embed your reviews here.</p>
+        <div class="action-links space-x-4">
+            <a href="/get-snippets/" class="action-link bg-primary text-white py-3 px-6 rounded-md hover:bg-red-700">View Snippets</a>
+            <a href="/scrape-reviews/" class="action-link bg-secondary text-white py-3 px-6 rounded-md hover:bg-orange-600">Scrape New Reviews</a>
+        </div>
+    </div>
+</section>
+
+<!-- Logout Section -->
+<section class="logout py-8 bg-dark text-white text-center">
+    <a href="/logout" id="logout-btn" class="bg-red-500 text-white py-3 px-6 rounded-md hover:bg-red-600">Logout</a>
+</section>
+{% endblock %}

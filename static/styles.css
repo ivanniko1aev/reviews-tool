@@ -1,0 +1,70 @@
+/* styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Global Styles */
+html {
+    font-size: 16px; /* Custom base font size */
+}
+
+body {
+    font-family: 'Rubik', sans-serif;
+    line-height: 1.6;
+    background-color: #E2E8CE; /* Light Beige Background */
+    color: #262626; /* Dark text color */
+}
+
+h1, h2, h3 {
+    font-family: 'Rubik', serif;
+    font-weight: bold;
+}
+
+button {
+    @apply text-white rounded-md transition-all ease-in-out;
+}
+
+.btn-primary {
+    @apply bg-primary text-white py-3 px-6 rounded-md hover:bg-red-700;
+}
+
+.btn-secondary {
+    @apply bg-secondary text-white py-3 px-6 rounded-md hover:bg-orange-600;
+}
+
+input, textarea {
+    @apply w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary;
+}
+
+/* For headers and text */
+h1, h2 {
+    @apply text-primary;
+}
+
+a {
+    @apply text-primary hover:text-red-600;
+}
+
+/* Modal Styling */
+.modal {
+    @apply fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 hidden;
+}
+
+.modal-content {
+    @apply bg-white p-8 rounded-lg w-96 shadow-lg;
+}
+
+/* Card and Carousel styling */
+.review {
+    @apply bg-white p-4 rounded-lg shadow-lg;
+}
+
+/* Loading Spinner */
+#loading {
+    @apply text-xl text-gray-600;
+}
+
+/* Textarea styling */
+textarea {
+    @apply bg-light p-4 border border-gray-300 rounded-md;
+}

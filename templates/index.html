@@ -1,123 +1,100 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Review Scraper Tool{% endblock %}
+{% block title %}Home - Feedback Forge{% endblock %}
 
 {% block content %}
-<div id="signup-modal" class="modal" style="display: none;">
+<!-- Signup Modal -->
+<div id="signup-modal" class="modal">
     <div class="modal-content">
-        <h2>Sign Up / Get API Key</h2>
-        <input type="email" id="signup-email" placeholder="Enter your email">
-        <button id="signup-submit">Get API Key</button>
-        <p id="signup-message"></p>
-        <button onclick="document.getElementById('signup-modal').style.display='none'">Close</button>
+        <h2 class="text-2xl font-semibold mb-4 text-primary">Sign Up / Get API Key</h2>
+        <input type="email" id="signup-email" class="w-full p-3 border border-gray-300 rounded-md mb-4" placeholder="Enter your email">
+        <button id="signup-submit" class="w-full bg-primary text-white py-3 rounded-md hover:bg-red-700">Get API Key</button>
+        <p id="signup-message" class="mt-4 text-green-600"></p>
+        <button onclick="document.getElementById('signup-modal').classList.add('hidden')" class="mt-4 text-gray-500 hover:text-gray-700">Close</button>
     </div>
 </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Get Google Reviews in Seconds</h1>
-            <p>Embed Google reviews onto your site with just a few clicks.</p>
-            <input type="text" id="google-url" class="input-field-main" placeholder="Enter Google Maps URL">
-            <button id="scrape-btn" class="cta-btn">Generate Code</button>
-            <!-- Loading spinner -->
-<div id="loading" style="display:none;">⏳ Scraping reviews... This might take a minute.</div>
+<!-- Hero Section -->
+<section class="hero bg-primary text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <h1 class="text-4xl font-bold mb-4 text-white">Get Google Reviews in Seconds</h1>
+        <p class="text-lg mb-6">Embed Google reviews onto your site with just a few clicks.</p>
+        <input type="text" id="google-url" class="w-1/2 p-3 border border-gray-300 rounded-md mb-4" placeholder="Enter Google Maps URL">
+        <button id="scrape-btn" class="bg-secondary text-white py-3 px-6 rounded-md hover:bg-orange-600">Generate Code</button>
+        <div id="loading" class="mt-4 text-xl hidden">⏳ Scraping reviews... This might take a minute.</div>
+    </div>
+</section>
 
-        </div>
-    </section>
-
-       <!-- Reviews Section with Carousel -->
-       <div id="reviews-section">
-        <h2>Customer Reviews</h2>
-        <div id="reviews-container">
-            <div class="review-carousel" id="review-carousel">
+<!-- Reviews Section with Carousel -->
+<section id="reviews-section" class="bg-white py-16">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Customer Reviews</h2>
+        <div id="reviews-container" class="mb-6">
+            <div class="review-carousel flex overflow-x-auto space-x-4">
                 <!-- Reviews will be dynamically inserted here -->
             </div>
         </div>
-        <!-- Optional: Add navigation buttons -->
-        <div class="carousel-controls">
-            <button id="prev-btn" onclick="scrollCarousel('prev')">Prev</button>
-            <button id="next-btn" onclick="scrollCarousel('next')">Next</button>
+        <div class="carousel-controls flex justify-center space-x-4">
+            <button id="prev-btn" onclick="scrollCarousel('prev')" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-red-700">Prev</button>
+            <button id="next-btn" onclick="scrollCarousel('next')" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-red-700">Next</button>
         </div>
     </div>
+</section>
 
-    <!-- Customization Section -->
-<section class="customization" id="features">
-    <div class="container">
-        <h2>Customize Your Review Widget</h2>
-        
-        <form id="customization-form">
+<!-- Customization Section -->
+<section class="customization bg-light py-16" id="features">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-semibold text-center mb-8 text-primary">Customize Your Review Widget</h2>
+        <form id="customization-form" class="space-y-6">
             <div class="form-group">
-                <label for="font">Font</label>
-                <select id="font" class="select-field" required>
+                <label for="font" class="block text-lg font-medium">Font</label>
+                <select id="font" class="w-full p-3 border border-gray-300 rounded-md" required>
                     <option value="Arial">Arial</option>
                     <option value="Verdana">Verdana</option>
                     <option value="Courier New">Courier New</option>
                 </select>
             </div>
-        
-            <div class="form-group">
-                <label for="font-size">Font Size</label>
-                <input type="number" id="font-size" class="input-field" value="16" min="10" max="40" required>
-            </div>
-        
-            <!-- Custom Color Picker for Background Color -->
-            <div class="form-group">
-                <label for="bg-color">Background Color</label>
-                <div class="color-picker">
-                    <div class="color-palette">
-                        <div class="color-box-bg" style="background-color: #ff7a18;" data-color="#ff7a18"></div>
-                        <div class="color-box-bg" style="background-color: #4caf50;" data-color="#4caf50"></div>
-                        <div class="color-box-bg" style="background-color: #2196f3;" data-color="#2196f3"></div>
-                        <div class="color-box-bg" style="background-color: #ffeb3b;" data-color="#ffeb3b"></div>
-                        <div class="color-box-bg" style="background-color: #9c27b0;" data-color="#9c27b0"></div>
-                        <div class="color-box-bg" style="background-color: #f44336;" data-color="#f44336"></div>
-                    </div>
-                    <input type="text" id="bg-color" class="input-field" value="#ffffff" readonly>
-                </div>
-            </div>
-        
-            <!-- Custom Color Picker for Text Color -->
-            <div class="form-group">
-                <label for="text-color">Text Color</label>
-                <div class="color-picker">
-                    <div class="color-palette">
-                        <div class="color-box-text" style="background-color: #ff7a18;" data-color="#ff7a18"></div>
-                        <div class="color-box-text" style="background-color: #4caf50;" data-color="#4caf50"></div>
-                        <div class="color-box-text" style="background-color: #2196f3;" data-color="#2196f3"></div>
-                        <div class="color-box-text" style="background-color: #ffeb3b;" data-color="#ffeb3b"></div>
-                        <div class="color-box-text" style="background-color: #9c27b0;" data-color="#9c27b0"></div>
-                        <div class="color-box-text" style="background-color: #f44336;" data-color="#f44336"></div>
-                    </div>
-                    <input type="text" id="text-color" class="input-field" value="#000000" readonly>
-                </div>
-            </div>
-        
-            <button type="submit" class="cta-btn">Generate Embed Code</button>
-        </form>
-        
-        
 
-        <!-- Reviews Section with Carousel -->
-<div id="reviews-section">
-    <h2>Customer Reviews</h2>
-    <div id="reviews-container">
-        <div class="review-carousel" id="review-carousel">
-            <!-- Reviews will be dynamically inserted here -->
+            <div class="form-group">
+                <label for="font-size" class="block text-lg font-medium">Font Size</label>
+                <input type="number" id="font-size" class="w-full p-3 border border-gray-300 rounded-md" value="16" min="10" max="40" required>
+            </div>
+
+            <div class="form-group">
+                <label for="bg-color" class="block text-lg font-medium">Background Color</label>
+                <div class="color-picker flex gap-4 mb-4">
+                    <div class="color-box-bg w-10 h-10 rounded-full cursor-pointer bg-orange-500" data-color="#ff7a18"></div>
+                    <div class="color-box-bg w-10 h-10 rounded-full cursor-pointer bg-green-500" data-color="#4caf50"></div>
+                    <div class="color-box-bg w-10 h-10 rounded-full cursor-pointer bg-blue-500" data-color="#2196f3"></div>
+                    <div class="color-box-bg w-10 h-10 rounded-full cursor-pointer bg-yellow-500" data-color="#ffeb3b"></div>
+                    <div class="color-box-bg w-10 h-10 rounded-full cursor-pointer bg-purple-500" data-color="#9c27b0"></div>
+                    <div class="color-box-bg w-10 h-10 rounded-full cursor-pointer bg-red-500" data-color="#f44336"></div>
+                </div>
+                <input type="text" id="bg-color" class="w-full p-3 border border-gray-300 rounded-md" value="#ffffff" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="text-color" class="block text-lg font-medium">Text Color</label>
+                <div class="color-picker flex gap-4 mb-4">
+                    <div class="color-box-text w-10 h-10 rounded-full cursor-pointer bg-orange-500" data-color="#ff7a18"></div>
+                    <div class="color-box-text w-10 h-10 rounded-full cursor-pointer bg-green-500" data-color="#4caf50"></div>
+                    <div class="color-box-text w-10 h-10 rounded-full cursor-pointer bg-blue-500" data-color="#2196f3"></div>
+                    <div class="color-box-text w-10 h-10 rounded-full cursor-pointer bg-yellow-500" data-color="#ffeb3b"></div>
+                    <div class="color-box-text w-10 h-10 rounded-full cursor-pointer bg-purple-500" data-color="#9c27b0"></div>
+                    <div class="color-box-text w-10 h-10 rounded-full cursor-pointer bg-red-500" data-color="#f44336"></div>
+                </div>
+                <input type="text" id="text-color" class="w-full p-3 border border-gray-300 rounded-md" value="#000000" readonly>
+            </div>
+
+            <button type="submit" class="bg-primary text-white py-3 px-6 rounded-md hover:bg-red-700">Generate Embed Code</button>
+        </form>
+
+        <!-- Embed Code Section -->
+        <div class="mt-8 text-center">
+            <h3 class="text-2xl font-semibold mb-4 text-primary">Embed Code</h3>
+            <textarea id="embed-code" class="w-full h-48 p-4 border border-gray-300 rounded-md" readonly></textarea>
         </div>
     </div>
-    <!-- Optional: Add navigation buttons -->
-    <div class="carousel-controls">
-        <button id="prev-btn" onclick="scrollCarousel('prev')">Prev</button>
-        <button id="next-btn" onclick="scrollCarousel('next')">Next</button>
-    </div>
-</div>
-
-
-        <h3>Embed Code</h3>
-        <textarea id="embed-code" readonly></textarea>
-    </div>
 </section>
-
 
 {% endblock %}

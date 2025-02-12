@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Review Scraper Tool{% endblock %}</title>
+    <title>{% block title %}Feedback Forge{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='output.css') }}">
 </head>
-<body>
+<body class="{{ body_class | default('') }} bg-light text-dark font-sans">
 
     <!-- Navigation Bar -->
-    <header>
-        <nav>
-            <a href="/" class="logo">GoogleEmbed</a>
-            <ul>
-                <li><a href="/#features">Features</a></li>
-                <li><a href="/#about">About</a></li>
-                <li><a href="/#contact">Contact</a></li>
+    <header class="bg-dark text-white">
+        <nav class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <a href="/" class="text-3xl font-bold">Feedback Forge</a>
+            <ul class="flex space-x-6">
+                <li><a href="/#features" class="hover:text-secondary">Features</a></li>
+                <li><a href="/#about" class="hover:text-secondary">About</a></li>
+                <li><a href="/#contact" class="hover:text-secondary">Contact</a></li>
                 <li id="auth-section">
                     {% if request.session.get("user_email") %}
-                        <button id="logout-btn">Logout</button>
+                        <button onclick="window.location.href='/dashboard'" class="bg-primary hover:bg-red-600 text-white py-2 px-4 rounded-md">Dashboard</button>
                     {% else %}
-                        <a href="{{ url_for('login') }}"><button id="login-btn">Sign Up / Login</button></a>
+                        <a href="{{ url_for('login') }}">
+                            <button id="login-btn" class="bg-secondary hover:bg-orange-600 text-white py-2 px-4 rounded-md">Sign Up / Login</button>
+                        </a>
                     {% endif %}
                 </li>
             </ul>
@@ -34,7 +36,16 @@
     </main>
 
     <!-- Footer -->
-    <footer id="contact">
-        <div class="container">
-            <p>&copy; 2025 ReviewScraper. All rights reserved.</p>
-            <p>Follow us on <a href="#">Instagram</a>, <
+    <footer id="contact" class="bg-dark text-white py-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 Feedback Forge. All rights reserved.</p>
+            <p>Follow us on 
+                <a href="#" class="text-primary hover:text-red-600">Instagram</a>, 
+                <a href="#" class="text-primary hover:text-red-600">Twitter</a>, and 
+                <a href="#" class="text-primary hover:text-red-600">Facebook</a>.
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
