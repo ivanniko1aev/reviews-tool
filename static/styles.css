@@ -68,3 +68,20 @@ a {
 textarea {
     @apply bg-light p-4 border border-gray-300 rounded-md;
 }
+
+.dropdown-results {
+    border: 1px solid #ccc;
+    background-color: white;
+    position: absolute;
+    z-index: 1000;
+    width: calc(100% - 1rem); /* Adjust width to match input */
+    max-height: 200px; /* Limit height */
+    overflow-y: auto; /* Scroll if too many results */
+}
+.result-item {
+    padding: 10px;
+    cursor: pointer;
+}
+.result-item:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}

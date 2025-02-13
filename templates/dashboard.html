@@ -16,6 +16,47 @@
     </div>
 </section>
 
+<!-- Business Search Section -->
+<section class="search-form py-16 bg-light relative">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-semibold text-primary mb-6 text-center">Search for Your Business</h2>
+        <div class="flex flex-col items-center space-y-4">
+            <input id="business_name" type="text" placeholder="Enter your business name" 
+                   class="border rounded-md p-2 w-full max-w-2xl" required>
+            <button id="search_button" class="bg-primary text-white py-2 px-4 rounded-md" 
+                    onclick="handleSearchClick()">Search</button>
+        </div>
+        
+        <!-- Results container -->
+        <div id="results" class="results-list mt-4 max-w-2xl mx-auto"></div>
+    </div>
+</section>
+
+<!-- Selected Business Section (Initially Hidden) -->
+<section id="selected-business-section" class="py-16 bg-white hidden">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-semibold text-primary mb-2">Your Selected Business</h2>
+            <div id="selected-business-info" class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <p class="text-xl font-bold" id="selected-business-name"></p>
+                <p class="text-gray-600" id="selected-business-address"></p>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div id="reviews-section" class="mt-8">
+            <h3 class="text-xl font-semibold mb-4">Reviews</h3>
+            <div id="reviews-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Reviews will be populated here -->
+            </div>
+            <div id="loading-reviews" class="hidden text-center py-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p class="mt-2">Loading reviews...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Dashboard Actions Section -->
 <section class="dashboard-actions py-16 bg-light">
     <div class="max-w-7xl mx-auto px-4 text-center">
