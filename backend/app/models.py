@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, Text
-from backend.app.database import Base
+from database import Base
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -36,3 +36,17 @@ class Review(Base):
 
     # Define the relationship with the user
     user = relationship("User", back_populates="reviews")
+
+class BusinessSelection(Base):
+    __tablename__ = "business_selections"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)  # One business per user
+    place_id = Column(String, nullable=False)
+    business_name = Column(String, nullable=False)
+    business_address = Column(String)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    # Define the relationship with the user
+    user = relationship("User", backref="business_selection")
