@@ -1,4 +1,4 @@
-console.log('script.js loaded'); // Add this line at the top of script.js
+console.log('script.js loaded'); // Debug line
 
 // Handle login button click - Show the signup modal
 document.getElementById("login-btn").addEventListener("click", () => {
@@ -129,16 +129,28 @@ function initAutocomplete() {
 // Ensure the initAutocomplete function is called when the API is loaded
 window.initAutocomplete = initAutocomplete;
 */
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed'); // Debugging line
-    const searchButton = document.getElementById('search_button');
-    if (searchButton) {
-        console.log('Search button found'); // Debugging line
-        searchButton.addEventListener('click', function() {
-            alert('Button clicked!'); // Simple test to see if the button works
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Loading dashboard...'); // Debug line
+    
+    try {
+        const response = await fetch('/api/saved-business', {
+            credentials: 'include'
         });
-    } else {
-        console.error('Search button not found'); // Log if button is not found
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.business) {
+                // If there's a saved business, display it
+                selectPlace({
+                    id: data.business.place_id,
+                    displayName: { text: data.business.business_name },
+                    formattedAddress: data.business.business_address || ''
+                });
+            }
+            // If no saved business, do nothing (search form is already visible)
+        }
+    } catch (error) {
+        console.error('Error checking for saved business:', error);
     }
 });
 
@@ -162,27 +174,47 @@ function displayResults(places) {
     }
 }
 
-function selectPlace(place) {
+async function selectPlace(place) {
+    console.log('Selecting place:', place); // Debug log
+    
     // Show the selected business section
     const selectedSection = document.getElementById('selected-business-section');
     selectedSection.classList.remove('hidden');
 
     // Update the selected business info
     document.getElementById('selected-business-name').textContent = place.displayName.text;
-    document.getElementById('selected-business-address').textContent = place.formattedAddress || '';
+    document.getElementById('selected-business-address').textContent = place.formattedAddress;
 
-    // Clear previous search results and update search input
-    document.getElementById('results').innerHTML = '';
-    document.getElementById('business_name').value = place.displayName.text;
+    // Save the business selection
+    try {
+        const response = await fetch('/api/save-business', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                place_id: place.id,
+                business_name: place.displayName.text,
+                business_address: place.formattedAddress
+            }),
+            // Include credentials to send cookies
+            credentials: 'include'
+        });
 
-    // Show loading state for reviews
-    const loadingElement = document.getElementById('loading-reviews');
-    loadingElement.classList.remove('hidden');
-    
-    // Clear previous reviews
-    document.getElementById('reviews-container').innerHTML = '';
+        console.log('Save business response status:', response.status); // Debug log
+
+        if (!response.ok) {
+            console.error('Failed to save business selection');
+        } else {
+            const result = await response.json();
+            console.log('Save business result:', result);
+        }
+    } catch (error) {
+        console.error('Error saving business selection:', error);
+    }
 
     // Fetch reviews for the selected place
+    console.log('Fetching reviews for place ID:', place.id);
     fetchReviews(place.id);
 }
 
@@ -200,29 +232,27 @@ async function fetchReviews(placeId) {
         }
 
         const data = await response.json();
+        console.log('Received reviews data:', data);
+        // The response contains a 'reviews' property
         displayReviews(data.reviews);
     } catch (error) {
         console.error('Error fetching reviews:', error);
         document.getElementById('reviews-container').innerHTML = 
             '<p class="text-red-500 text-center">Error loading reviews. Please try again later.</p>';
     } finally {
-        // Hide loading state
         document.getElementById('loading-reviews').classList.add('hidden');
     }
 }
 
 function displayReviews(reviews) {
+    console.log('Displaying reviews:', reviews);
     const container = document.getElementById('reviews-container');
     container.innerHTML = ''; // Clear existing reviews
 
     if (reviews && reviews.length > 0) {
         reviews.forEach(review => {
             const reviewElement = document.createElement('div');
-            reviewElement.className = 'review-card bg-white p-4 rounded-lg shadow-md';
-            
-            // Create star rating
-            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-            
+            reviewElement.className = 'review-card bg-white p-4 rounded-lg shadow-md mb-4';
             reviewElement.innerHTML = `
                 <div class="flex items-center mb-2">
                     <img src="${review.profile_photo_url || '/static/default-avatar.png'}" 
@@ -230,20 +260,18 @@ function displayReviews(reviews) {
                          class="w-10 h-10 rounded-full mr-2">
                     <div>
                         <div class="font-semibold">${review.author}</div>
-                        <div class="text-yellow-400">${stars}</div>
+                        <div class="text-yellow-400">
+                            ${'★'.repeat(parseInt(review.rating))}${'☆'.repeat(5-parseInt(review.rating))}
+                        </div>
                     </div>
                 </div>
-                <p class="text-gray-600 mt-2">${review.content || 'No review content'}</p>
+                <p class="text-gray-600 mt-2">${review.content}</p>
                 <div class="text-sm text-gray-400 mt-2">${review.relative_time}</div>
             `;
             container.appendChild(reviewElement);
         });
     } else {
-        container.innerHTML = `
-            <div class="text-center text-gray-600 p-4">
-                <p>No reviews found for this business.</p>
-                <p class="text-sm mt-2">Be the first to leave a review!</p>
-            </div>`;
+        container.innerHTML = '<p class="text-center text-gray-600">No reviews found for this business.</p>';
     }
 }
 
@@ -304,4 +332,41 @@ function handleSearchClick() {
         console.error('Error:', error);
         resultsContainer.innerHTML = '<p class="text-red-500 text-center">Error fetching results. Please try again.</p>';
     });
+}
+
+// Add function to load saved business on page load
+async function loadSavedBusiness() {
+    console.log('loadSavedBusiness called'); // Debug line
+    try {
+        console.log('Attempting to load saved business...'); // Debug line
+        const response = await fetch('/api/saved-business', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        console.log('Load business response status:', response.status); // Debug line
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Loaded saved business data:', data); // Debug line
+            if (data.business) {
+                // Simulate selecting the place
+                selectPlace({
+                    id: data.business.place_id,
+                    displayName: { text: data.business.business_name },
+                    formattedAddress: data.business.business_address
+                });
+            } else {
+                console.log('No saved business found'); // Debug line
+            }
+        } else {
+            console.error('Failed to load saved business, status:', response.status);
+        }
+    } catch (error) {
+        console.error('Error loading saved business:', error);
+        throw error; // Re-throw to be caught by the caller
+    }
 }

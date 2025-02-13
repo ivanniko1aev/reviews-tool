@@ -32,14 +32,18 @@
     </div>
 </section>
 
-<!-- Selected Business Section (Initially Hidden) -->
-<section id="selected-business-section" class="py-16 bg-white hidden">
+<!-- Selected Business Section -->
+<section id="selected-business-section" class="py-16 bg-white {% if not saved_business %}hidden{% endif %}">
     <div class="max-w-7xl mx-auto px-4">
         <div class="text-center mb-8">
             <h2 class="text-2xl font-semibold text-primary mb-2">Your Selected Business</h2>
             <div id="selected-business-info" class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <p class="text-xl font-bold" id="selected-business-name"></p>
-                <p class="text-gray-600" id="selected-business-address"></p>
+                <p class="text-xl font-bold" id="selected-business-name">
+                    {% if saved_business %}{{ saved_business.business_name }}{% endif %}
+                </p>
+                <p class="text-gray-600" id="selected-business-address">
+                    {% if saved_business %}{{ saved_business.business_address }}{% endif %}
+                </p>
             </div>
         </div>
 
@@ -73,4 +77,14 @@
 <section class="logout py-8 bg-dark text-white text-center">
     <a href="/logout" id="logout-btn" class="bg-red-500 text-white py-3 px-6 rounded-md hover:bg-red-600">Logout</a>
 </section>
+
+<!-- Add this script section at the bottom of your template -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if saved_business %}
+            // Load reviews for the saved business
+            fetchReviews('{{ saved_business.place_id }}');
+        {% endif %}
+    });
+</script>
 {% endblock %}

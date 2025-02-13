@@ -8,13 +8,13 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from backend.app.database import get_db
-from backend.app.models import User, EmbedSnippet
-from backend.app.auth import router as auth_router
+from .database import get_db
+from .models import User, EmbedSnippet, BusinessSelection
+from .auth import router as auth_router
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.scraper import GoogleReviewScraper
+from .scraper import GoogleReviewScraper
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ def get_snippets(request: Request, db: Session = Depends(get_db)):
     return {"snippets": [{"business_url": s.business_url, "embed_code": s.embed_code} for s in snippets]}
 
 @app.get("/dashboard", response_class=HTMLResponse)
-def dashboard(request: Request):
+def dashboard(request: Request, db: Session = Depends(get_db)):
     logger.info("Handling dashboard request")
     user_email = request.session.get("user_email")
     user_name = request.session.get("user_name")
@@ -106,6 +106,24 @@ def dashboard(request: Request):
         logger.warning("Unauthorized attempt to access dashboard - redirecting to login")
         return RedirectResponse(url="/login")
 
+    # Get user's saved business if it exists
+    saved_business = None
+    try:
+        user = db.query(User).filter(User.email == user_email).first()
+        if user:
+            business_selection = db.query(BusinessSelection).filter(
+                BusinessSelection.user_id == user.id
+            ).first()
+            if business_selection:
+                saved_business = {
+                    "place_id": business_selection.place_id,
+                    "business_name": business_selection.business_name,
+                    "business_address": business_selection.business_address
+                }
+                logger.info(f"Found saved business for user {user_email}: {business_selection.business_name}")
+    except Exception as e:
+        logger.error(f"Error fetching saved business: {e}")
+
     logger.info(f"Rendering dashboard for user: {user_email}")
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
@@ -113,7 +131,8 @@ def dashboard(request: Request):
         "user_name": user_name,
         "user_picture": user_picture,
         "google_maps_api_key": google_maps_api_key,
-        "google_maps_api_secret": google_maps_api_secret
+        "google_maps_api_secret": google_maps_api_secret,
+        "saved_business": saved_business  # Add saved business to template context
     })
 
 @app.get("/login", response_class=HTMLResponse)
@@ -209,4 +228,58 @@ async def get_reviews(place_id: str):
         
     except Exception as e:
         logger.error(f"Error fetching reviews: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/save-business")
+async def save_business(request: Request, db: Session = Depends(get_db)):
+    logger.info("Handling save business request")
+    user_email = request.session.get("user_email")
+    if not user_email:
+        logger.warning("Unauthorized attempt to save business - no user email in session")
+        raise HTTPException(status_code=401, detail="User not authenticated")
+
+    # Get the request body
+    data = await request.json()
+    place_id = data.get("place_id")
+    business_name = data.get("business_name")
+    business_address = data.get("business_address")
+
+    if not all([place_id, business_name]):
+        raise HTTPException(status_code=400, detail="Missing required fields")
+
+    try:
+        # Get the user
+        user = db.query(User).filter(User.email == user_email).first()
+        if not user:
+            logger.error(f"User not found in database: {user_email}")
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Check if user already has a business selection
+        business_selection = db.query(BusinessSelection).filter(
+            BusinessSelection.user_id == user.id
+        ).first()
+
+        if business_selection:
+            # Update existing selection
+            business_selection.place_id = place_id
+            business_selection.business_name = business_name
+            business_selection.business_address = business_address
+            logger.info(f"Updated business selection for user: {user_email}")
+        else:
+            # Create new selection
+            business_selection = BusinessSelection(
+                user_id=user.id,
+                place_id=place_id,
+                business_name=business_name,
+                business_address=business_address
+            )
+            db.add(business_selection)
+            logger.info(f"Created new business selection for user: {user_email}")
+
+        db.commit()
+        return {"status": "success"}
+
+    except Exception as e:
+        logger.error(f"Error saving business selection: {e}")
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
