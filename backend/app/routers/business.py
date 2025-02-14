@@ -19,7 +19,7 @@ async def get_places(request: Request):
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": api_key,
-        "X-Goog-FieldMask": "places.id,places.displayName"
+        "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress"
     }
     payload = {"textQuery": text_query}
 

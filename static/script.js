@@ -159,18 +159,68 @@ function displayResults(places) {
     resultsContainer.innerHTML = ''; // Clear previous results
 
     if (places && places.length > 0) {
+        const resultsWrapper = document.createElement('div');
+        resultsWrapper.className = 'space-y-3 animate-fade-in-down';
+        
         places.forEach(place => {
             const resultItem = document.createElement('div');
-            resultItem.className = 'result-item p-4 border rounded-md mb-2 cursor-pointer hover:bg-gray-100 transition-colors';
-            resultItem.innerHTML = `
-                <div class="font-bold">${place.displayName.text}</div>
-                <div class="text-sm text-gray-600">${place.formattedAddress}</div>
+            resultItem.className = `
+                group
+                p-6 
+                border border-gray-200 
+                rounded-lg 
+                shadow-sm 
+                hover:shadow-md 
+                cursor-pointer 
+                bg-white 
+                transition-all 
+                duration-200 
+                ease-in-out 
+                hover:scale-[1.02] 
+                hover:border-primary/50
             `;
+            
+            resultItem.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="space-y-1">
+                        <div class="font-semibold text-lg text-gray-900 group-hover:text-primary">${place.displayName.text}</div>
+                        <div class="text-sm text-gray-600 flex items-center">
+                            <svg class="w-4 h-4 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
+                                </path>
+                            </svg>
+                            ${place.formattedAddress}
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 transform transition-transform group-hover:translate-x-1" 
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M9 5l7 7-7 7">
+                        </path>
+                    </svg>
+                </div>
+            `;
+            
             resultItem.onclick = () => selectPlace(place);
-            resultsContainer.appendChild(resultItem);
+            resultsWrapper.appendChild(resultItem);
         });
+        
+        resultsContainer.appendChild(resultsWrapper);
     } else {
-        resultsContainer.innerHTML = '<p class="text-center text-gray-600">No results found.</p>';
+        resultsContainer.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                    </path>
+                </svg>
+                <p class="mt-2 text-sm">No results found.</p>
+            </div>
+        `;
     }
 }
 
