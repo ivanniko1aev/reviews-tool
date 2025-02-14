@@ -4,8 +4,9 @@ from pydantic import BaseModel
 import asyncio
 import logging
 from backend.app.database import get_db
-from backend.app.models import User, EmbedSnippet
+from backend.app.models import User, EmbedSnippet, Review
 from backend.app.scraper import GoogleReviewScraper
+from datetime import datetime
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -49,30 +50,73 @@ async def scrape_reviews(request: ScrapeRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/reviews/{place_id}")
-async def get_reviews(place_id: str):
+async def get_reviews(
+    place_id: str, 
+    request: Request,
+    db: Session = Depends(get_db)
+):
     try:
         logger.info(f"Fetching reviews for place_id: {place_id}")
+        
+        user_email = request.session.get("user_email")
+        if not user_email:
+            raise HTTPException(status_code=401, detail="User not authenticated")
+            
+        user = db.query(User).filter(User.email == user_email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Check for existing reviews
+        existing_reviews = db.query(Review).filter(Review.place_id == place_id).all()
+        
+        if existing_reviews:
+            logger.info(f"Found {len(existing_reviews)} existing reviews in database")
+            formatted_reviews = [{
+                'author': review.author,
+                'rating': review.rating,
+                'content': review.content,
+                'time': review.date.timestamp() if review.date else None,
+                'relative_time': "Previously saved",
+                'profile_photo_url': review.profile_photo_url
+            } for review in existing_reviews]
+            
+            return {"reviews": formatted_reviews}
+            
+        # Fetch new reviews from API
+        logger.info("No existing reviews found, fetching from API")
         scraper = GoogleReviewScraper()
-        # Use the _fetch_reviews_api method directly since we already have the place_id
         reviews = scraper._fetch_reviews_api(place_id, max_reviews=5)
         
         if not reviews:
             logger.warning(f"No reviews found for place_id: {place_id}")
             return {"reviews": []}
             
-        # Format the reviews
-        formatted_reviews = []
-        for review in reviews:
-            formatted_reviews.append({
-                'author': review.get('author_name', 'Anonymous'),
-                'rating': review.get('rating', 0),
-                'content': review.get('text', 'No content'),
-                'time': review.get('time', None),
-                'relative_time': review.get('relative_time_description', 'Recently'),
-                'profile_photo_url': review.get('profile_photo_url', None)
-            })
+        # Save reviews to database
+        for review_data in reviews:
+            new_review = Review(
+                place_id=place_id,
+                author=review_data.get('author_name', 'Anonymous'),
+                rating=str(review_data.get('rating', 0)),
+                content=review_data.get('text', 'No content'),
+                date=datetime.fromtimestamp(review_data.get('time')) if review_data.get('time') else None,
+                user_id=user.id,
+                profile_photo_url=review_data.get('profile_photo_url')
+            )
+            db.add(new_review)
+        
+        db.commit()
+        logger.info(f"Saved {len(reviews)} new reviews to database")
             
-        logger.info(f"Successfully retrieved {len(formatted_reviews)} reviews")
+        # Format the reviews for response
+        formatted_reviews = [{
+            'author': review.get('author_name', 'Anonymous'),
+            'rating': review.get('rating', 0),
+            'content': review.get('text', 'No content'),
+            'time': review.get('time', None),
+            'relative_time': review.get('relative_time_description', 'Recently'),
+            'profile_photo_url': review.get('profile_photo_url')
+        } for review in reviews]
+            
         return {"reviews": formatted_reviews}
         
     except Exception as e:

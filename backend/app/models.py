@@ -39,11 +39,13 @@ class Review(Base):
     __tablename__ = 'reviews'
 
     id = Column(Integer, primary_key=True, index=True)
+    place_id = Column(String, index=True)  # Add this line
     author = Column(String, index=True)  # Author of the review
     rating = Column(String)  # Rating of the review
     content = Column(Text)  # Content of the review
     date = Column(DateTime, default=func.now())  # Date of the review
     user_id = Column(Integer, ForeignKey('users.id'))  # Link to the user
+    profile_photo_url = Column(String, nullable=True)
 
     # Define the relationship with the user
     user = relationship("User", back_populates="reviews")
