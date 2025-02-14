@@ -197,7 +197,6 @@ async function selectPlace(place) {
                 business_name: place.displayName.text,
                 business_address: place.formattedAddress
             }),
-            // Include credentials to send cookies
             credentials: 'include'
         });
 
@@ -205,55 +204,55 @@ async function selectPlace(place) {
 
         if (!response.ok) {
             console.error('Failed to save business selection');
-        } else {
-            const result = await response.json();
-            console.log('Save business result:', result);
+            return;
         }
-    } catch (error) {
-        console.error('Error saving business selection:', error);
-    }
+        
+        const result = await response.json();
+        console.log('Save business result:', result);
 
-    // Fetch reviews for the selected place
-    console.log('Fetching reviews for place ID:', place.id);
-    fetchReviews(place.id);
+        // Call fetchReviews with the place ID
+        console.log('Fetching reviews for place ID:', place.id); // Debug log
+        await fetchReviews(place.id);
+        
+    } catch (error) {
+        console.error('Error in selectPlace:', error);
+    }
 }
 
 async function fetchReviews(placeId) {
+    console.log('fetchReviews called with placeId:', placeId); // Debug log
     try {
-        // Show loading state
-        document.getElementById('loading-reviews').classList.remove('hidden');
-        document.getElementById('reviews-container').innerHTML = ''; // Clear existing content
-
-        const response = await fetch(`/api/reviews/${placeId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        // Initialize the widget with the place ID
+        const widgetContainer = document.getElementById('business-reviews-widget');
+        if (!widgetContainer) {
+            console.error('Widget container not found');
+            return;
+        }
+        
+        widgetContainer.dataset.businessId = placeId;
+        
+        // Initialize the widget with default settings
+        BusinessReviewsWidget.init({
+            theme: 'light',
+            fontFamily: 'Inter, sans-serif',
+            textColor: '#1e293b',
+            starColor: '#eab308',
+            backgroundColor: '#ffffff',
+            cardBackground: '#f8fafc',
+            textSize: 14,
+            reviewsPerRow: 2,
+            containerWidth: '100%',
+            borderRadius: 8,
+            spacing: 16
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('Received reviews data:', data); // Debug log
-
-        if (!data.reviews || !Array.isArray(data.reviews)) {
-            throw new Error('Invalid reviews data format');
-        }
-
-        displayReviews(data.reviews);
     } catch (error) {
         console.error('Error fetching reviews:', error);
-        document.getElementById('reviews-container').innerHTML = 
-            '<p class="text-red-500 text-center">Error loading reviews. Please try again later.</p>';
-    } finally {
-        document.getElementById('loading-reviews').classList.add('hidden');
     }
 }
 
 function displayReviews(reviews) {
-    const container = document.getElementById('reviews-container');
+    const container = document.getElementById('business-reviews-widget');
     container.innerHTML = '';
 
     if (!reviews || reviews.length === 0) {
