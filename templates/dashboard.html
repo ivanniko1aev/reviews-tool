@@ -49,7 +49,94 @@
 
         <!-- Reviews Section -->
         <div id="reviews-section" class="mt-8">
-            <h3 class="text-xl font-semibold mb-4">Reviews</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Reviews</h3>
+                <button id="customize-button" 
+                        class="bg-secondary text-white px-4 py-2 rounded-md hover:bg-secondary-dark"
+                        onclick="toggleCustomizer()">
+                    Customize Embed
+                </button>
+            </div>
+            
+            <!-- Customization Panel (Initially Hidden) -->
+            <div id="customization-panel" class="hidden bg-white p-6 rounded-lg shadow-md mb-6">
+                <h4 class="text-lg font-semibold mb-4">Customize Your Review Widget</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Font Settings -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Font Family</label>
+                        <select id="font-family" class="w-full border rounded-md p-2" onchange="updatePreview()">
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica</option>
+                            <option value="'Open Sans', sans-serif">Open Sans</option>
+                            <option value="'Roboto', sans-serif">Roboto</option>
+                        </select>
+                    </div>
+
+                    <!-- Color Settings -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Text Color</label>
+                        <input type="color" id="text-color" value="#000000" 
+                               class="w-full h-10 border rounded-md" onchange="updatePreview()">
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Star Color</label>
+                        <input type="color" id="star-color" value="#FFD700" 
+                               class="w-full h-10 border rounded-md" onchange="updatePreview()">
+                    </div>
+
+                    <!-- Size Settings -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Review Text Size</label>
+                        <input type="range" id="text-size" min="12" max="24" value="16" 
+                               class="w-full" onchange="updatePreview()">
+                        <span id="text-size-value">16px</span>
+                    </div>
+
+                    <!-- Layout Settings -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Container Width</label>
+                        <select id="container-width" class="w-full border rounded-md p-2" onchange="updatePreview()">
+                            <option value="100%">Full Width</option>
+                            <option value="500px">500px</option>
+                            <option value="800px">800px</option>
+                            <option value="1000px">1000px</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Reviews Per Row</label>
+                        <select id="reviews-per-row" class="w-full border rounded-md p-2" onchange="updatePreview()">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Preview and Embed Code -->
+                <div class="mt-8">
+                    <h4 class="text-lg font-semibold mb-4">Preview</h4>
+                    <div id="reviews-preview" class="border rounded-lg p-4">
+                        <!-- Preview will be populated by JavaScript -->
+                    </div>
+
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold mb-2">Embed Code</h4>
+                        <div class="relative">
+                            <textarea id="embed-code" rows="4" 
+                                      class="w-full bg-gray-50 p-4 rounded-md font-mono text-sm" 
+                                      readonly></textarea>
+                            <button onclick="copyEmbedCode()" 
+                                    class="absolute top-2 right-2 bg-primary text-white px-3 py-1 rounded-md text-sm">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="reviews-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Reviews will be populated here -->
             </div>

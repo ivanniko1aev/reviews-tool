@@ -220,6 +220,10 @@ async function selectPlace(place) {
 
 async function fetchReviews(placeId) {
     try {
+        // Show loading state
+        document.getElementById('loading-reviews').classList.remove('hidden');
+        document.getElementById('reviews-container').innerHTML = ''; // Clear existing content
+
         const response = await fetch(`/api/reviews/${placeId}`, {
             method: 'GET',
             headers: {
@@ -228,12 +232,16 @@ async function fetchReviews(placeId) {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch reviews');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Received reviews data:', data);
-        // The response contains a 'reviews' property
+        console.log('Received reviews data:', data); // Debug log
+
+        if (!data.reviews || !Array.isArray(data.reviews)) {
+            throw new Error('Invalid reviews data format');
+        }
+
         displayReviews(data.reviews);
     } catch (error) {
         console.error('Error fetching reviews:', error);
@@ -245,34 +253,207 @@ async function fetchReviews(placeId) {
 }
 
 function displayReviews(reviews) {
-    console.log('Displaying reviews:', reviews);
     const container = document.getElementById('reviews-container');
-    container.innerHTML = ''; // Clear existing reviews
+    container.innerHTML = '';
 
-    if (reviews && reviews.length > 0) {
-        reviews.forEach(review => {
-            const reviewElement = document.createElement('div');
-            reviewElement.className = 'review-card bg-white p-4 rounded-lg shadow-md mb-4';
-            reviewElement.innerHTML = `
-                <div class="flex items-center mb-2">
-                    <img src="${review.profile_photo_url || '/static/default-avatar.png'}" 
-                         alt="${review.author}" 
-                         class="w-10 h-10 rounded-full mr-2">
-                    <div>
-                        <div class="font-semibold">${review.author}</div>
-                        <div class="text-yellow-400">
-                            ${'★'.repeat(parseInt(review.rating))}${'☆'.repeat(5-parseInt(review.rating))}
-                        </div>
+    if (!reviews || reviews.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-600">No reviews found for this business.</p>';
+        return;
+    }
+
+    reviews.forEach(review => {
+        const reviewElement = document.createElement('div');
+        reviewElement.className = 'review-card bg-white p-4 rounded-lg shadow-md mb-4';
+        
+        const fallbackAvatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(review.author);
+        const img = new Image();
+        let retryCount = 0;
+        const maxRetries = 2;  // Maximum number of retries
+
+        img.onload = () => {
+            // Image loaded successfully
+            img.className = 'w-10 h-10 rounded-full mr-2';
+        };
+
+        img.onerror = () => {
+            if (retryCount < maxRetries && review.profile_photo_url) {
+                // Retry loading the original image
+                retryCount++;
+                img.src = review.profile_photo_url;
+            } else {
+                // After max retries or if no profile photo URL, use fallback
+                img.src = fallbackAvatar;
+            }
+        };
+
+        // Initial load attempt
+        img.src = review.profile_photo_url || fallbackAvatar;
+        
+        reviewElement.innerHTML = `
+            <div class="flex items-center mb-2">
+                <div class="avatar-container">
+                    ${img.outerHTML}
+                </div>
+                <div>
+                    <div class="font-semibold">${review.author}</div>
+                    <div class="text-yellow-400">
+                        ${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}
                     </div>
                 </div>
-                <p class="text-gray-600 mt-2">${review.content}</p>
-                <div class="text-sm text-gray-400 mt-2">${review.relative_time}</div>
-            `;
-            container.appendChild(reviewElement);
-        });
-    } else {
-        container.innerHTML = '<p class="text-center text-gray-600">No reviews found for this business.</p>';
+            </div>
+            <p class="text-gray-600 mt-2">${review.content}</p>
+            <div class="text-sm text-gray-400 mt-2">${review.relative_time}</div>
+        `;
+        
+        container.appendChild(reviewElement);
+    });
+
+    // Also update the reviews preview if the customization panel is open
+    if (!document.getElementById('customization-panel').classList.contains('hidden')) {
+        updatePreview();
     }
+}
+
+let currentReviews = []; // Store the current reviews
+
+function toggleCustomizer() {
+    const panel = document.getElementById('customization-panel');
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+        updatePreview();
+    }
+}
+
+function updatePreview() {
+    const settings = getCustomizationSettings();
+    const previewContainer = document.getElementById('reviews-preview');
+    
+    // Apply styles to preview container
+    previewContainer.style.fontFamily = settings.fontFamily;
+    previewContainer.style.color = settings.textColor;
+    previewContainer.style.width = settings.containerWidth;
+    
+    // Generate preview HTML
+    const previewHTML = generateReviewsHTML(currentReviews, settings);
+    previewContainer.innerHTML = previewHTML;
+    
+    // Update embed code
+    generateEmbedCode(settings);
+}
+
+function getCustomizationSettings() {
+    return {
+        fontFamily: document.getElementById('font-family').value,
+        textColor: document.getElementById('text-color').value,
+        starColor: document.getElementById('star-color').value,
+        textSize: document.getElementById('text-size').value + 'px',
+        containerWidth: document.getElementById('container-width').value,
+        reviewsPerRow: document.getElementById('reviews-per-row').value
+    };
+}
+
+function generateReviewsHTML(reviews, settings) {
+    if (!reviews || reviews.length === 0) return '<p>No reviews to display</p>';
+
+    const gridCols = `grid-template-columns: repeat(${settings.reviewsPerRow}, 1fr);`;
+    
+    return `
+        <style>
+            .custom-reviews-grid {
+                display: grid;
+                ${gridCols}
+                gap: 1rem;
+            }
+            .custom-review-card {
+                font-family: ${settings.fontFamily};
+                color: ${settings.textColor};
+                font-size: ${settings.textSize};
+                background: white;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .custom-stars {
+                color: ${settings.starColor};
+            }
+        </style>
+        <div class="custom-reviews-grid">
+            ${reviews.map(review => `
+                <div class="custom-review-card">
+                    <div class="flex items-center mb-2">
+                        <img src="${review.profile_photo_url || '/static/default-avatar.png'}" 
+                             alt="${review.author}" 
+                             class="w-10 h-10 rounded-full mr-2">
+                        <div>
+                            <div class="font-semibold">${review.author}</div>
+                            <div class="custom-stars">
+                                ${'★'.repeat(parseInt(review.rating))}${'☆'.repeat(5-parseInt(review.rating))}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-2">${review.content}</p>
+                    <div class="text-sm opacity-75 mt-2">${review.relative_time}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+async function generateEmbedCode(settings) {
+    const currentPlace = document.getElementById('selected-business-name').textContent;
+    const embedCode = `
+<div id="business-reviews-widget" 
+     data-business-id="${currentBusinessId}"
+     style="width: ${settings.containerWidth}; font-family: ${settings.fontFamily};">
+    <script src="${window.location.origin}/static/widget.js"></script>
+    <script>
+        BusinessReviewsWidget.init({
+            fontFamily: '${settings.fontFamily}',
+            textColor: '${settings.textColor}',
+            starColor: '${settings.starColor}',
+            textSize: '${settings.textSize}',
+            reviewsPerRow: ${settings.reviewsPerRow}
+        });
+    </script>
+</div>`;
+
+    document.getElementById('embed-code').value = embedCode;
+
+    // Save the settings to the database
+    try {
+        const response = await fetch('/api/save-embed', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ...settings,
+                embedCode,
+                businessUrl: currentBusinessId
+            }),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            console.error('Failed to save embed settings');
+        }
+    } catch (error) {
+        console.error('Error saving embed settings:', error);
+    }
+}
+
+function copyEmbedCode() {
+    const embedCode = document.getElementById('embed-code');
+    embedCode.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = 'Copied!';
+    setTimeout(() => {
+        button.textContent = originalText;
+    }, 2000);
 }
 
 function handleSearchClick() {

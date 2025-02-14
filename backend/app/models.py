@@ -1,5 +1,9 @@
+try:
+    from backend.app.database import Base
+except ImportError:
+    from database import Base
+
 from sqlalchemy import Column, Integer, String, DateTime, func, Text
-from .database import Base
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -20,9 +24,16 @@ class EmbedSnippet(Base):
     __tablename__ = "embed_snippets"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    business_url = Column(String, unique=True)
+    business_url = Column(String)
     embed_code = Column(String)
     created_at = Column(DateTime, default=func.now())
+    # Add customization settings
+    font_family = Column(String)
+    text_color = Column(String)
+    star_color = Column(String)
+    text_size = Column(String)
+    container_width = Column(String)
+    reviews_per_row = Column(Integer)
 
 class Review(Base):
     __tablename__ = 'reviews'
